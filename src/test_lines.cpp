@@ -3,28 +3,37 @@
 // Moving line patterns
 void displayLinePattern()
 {
-    display.clearDisplay();
+    display.clearBuffer();
 
-    setCursorActual(0, 0);
-    display.setTextSize(1);
-    display.setTextColor(SH110X_WHITE);
-    display.print(F("Lines"));
+    display.setFont(u8g2_font_6x10_tr);
+    display.setDrawColor(1);
 
-    // Animated diagonal lines
-    int offset = (millis() / 50) % 20;
+    // Centered label
+    const char* label = "Lines";
+    int16_t labelW = strlen(label) * 6;
+    setCursorActual((ACTUAL_WIDTH - labelW) / 2, 0);
+    display.print(label);
 
-    for (int i = -20; i < ACTUAL_WIDTH + 20; i += 10)
+    // Animated diagonal lines, dynamic spacing
+    int offset = (millis() / 50) % (ACTUAL_WIDTH / 6);
+    int diagStep = ACTUAL_WIDTH / 8;
+    int diagLen = ACTUAL_WIDTH / 4;
+    int y1 = ACTUAL_HEIGHT / 4;
+    int y2 = (ACTUAL_HEIGHT * 3) / 4;
+    for (int i = -diagLen; i < ACTUAL_WIDTH + diagLen; i += diagStep)
     {
-        drawLineActual(i + offset, 10, i + offset + 20, 30, SH110X_WHITE);
+        int x2 = i + offset + diagLen;
+        drawLineActual(i + offset, y1, x2, y2, 1);
     }
 
-    // Vertical lines moving horizontally
+    // Vertical lines moving horizontally, dynamic spacing
     int vOffset = (millis() / 100) % ACTUAL_WIDTH;
+    int vStep = ACTUAL_WIDTH / 3;
     for (int i = 0; i < 3; i++)
     {
-        int x = (vOffset + i * 20) % ACTUAL_WIDTH;
-        drawLineActual(x, 10, x, ACTUAL_HEIGHT - 1, SH110X_WHITE);
+        int x = (vOffset + i * vStep) % ACTUAL_WIDTH;
+        drawLineActual(x, ACTUAL_HEIGHT / 4, x, ACTUAL_HEIGHT - 1, 1);
     }
 
-    display.display();
+    display.sendBuffer();
 }

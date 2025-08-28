@@ -1,68 +1,43 @@
 /*
- * ESP32-C3 OLED Hello World Demo
+ * ESP32-C3 OLED Hello World Demo (U8g2 SSD1306)
  *
- * This sketch displays "Hello World" on a 0.42 inch OLED display
- * connected to an ESP32-C3 development board.
- *
- * PlatformIO Libraries (automatically installed via platformio.ini):
- * - adafruit/Adafruit SH110X (SH1106 driver works better than SSD1306)
- * - adafruit/Adafruit GFX Library
- * - ricmoo/QRCode (for QR code generation)
- * - Wire (built-in Arduino library for I2C)
+ * This sketch displays "Hello World" and test patterns on a 0.42 inch OLED display
+ * connected to an ESP32-C3 development board using the U8g2 library.
  *
  * Hardware:
- * - ESP32-C3 Development Board with onboard 0.42" OLED (72x40 pixels)
- * - Pinout: SCL=GPIO6, SDA=GPIO5, LED=GPIO8, Boot Button=GPIO9
- * - Even though screen is 72x40, declare as 128x64 with offset (X=26, Y=24)
+ * - ESP32-C3 Development Board with onboard 0.42" OLED (72x40 pixels, SSD1306)
+ * - Pinout: SCL=GPIO6, SDA=GPIO5, LED=GPIO8 (active LOW), Boot Button=GPIO9
+ * - Display declared as 128x64 with offset (X=30, Y=12) for visible window
  */
 
 #include "config.h"
 #include "display_tests.h"
 
-// Create display object for SH1106
-Adafruit_SH1106G display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+// Create display object for SSD1306 (U8g2, HW I2C, no reset pin)
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C display(U8G2_R0, /* reset=*/U8X8_PIN_NONE, /* clock=*/SCL_PIN, /* data=*/SDA_PIN);
 
 void setup()
 {
     // Initialize serial communication for debugging
     Serial.begin(115200);
+    while (!Serial) { delay(10); }
 
-    // Wait for serial port to connect (useful for debugging)
-    while (!Serial)
-    {
-        delay(10);
-    }
+    Serial.println("ESP32-C3 OLED Hello World Demo (U8g2 SSD1306)");
 
-    Serial.println("ESP32-C3 OLED Hello World Demo (SH1106)");
-
-    // Initialize LED pin
+    // Initialize LED pin (active LOW)
     pinMode(LED_PIN, OUTPUT);
+    digitalWrite(LED_PIN, HIGH); // LED off
 
-    // Initialize I2C with custom pins
-    Wire.begin(SDA_PIN, SCL_PIN);
+    // Initialize display
+    display.begin();
+    display.clearBuffer();
+    display.setFont(u8g2_font_ncenB08_tr); // Set a default font
+    display.setContrast(255);
 
-    // Initialize the OLED display with SH1106 driver
-    if (!display.begin(SCREEN_ADDRESS, true)) // true = reset display
-    {
-        Serial.println(F("SH1106 allocation failed"));
-        for (;;)
-        {
-            // Don't proceed, loop forever - blink LED to indicate error
-            digitalWrite(LED_PIN, HIGH);
-            delay(500);
-            digitalWrite(LED_PIN, LOW);
-            delay(500);
-            Serial.println("OLED initialization failed - check connections!");
-        }
-    }
-
-    Serial.println("SH1106 OLED initialized successfully!");
-
-    // Clear the display buffer
-    display.clearDisplay();
+    Serial.println("SSD1306 OLED initialized successfully!");
 
     // Show initial display buffer contents on the screen
-    display.display();
+    display.sendBuffer();
     delay(1000);
 
     // Display pixel test
@@ -71,10 +46,6 @@ void setup()
 
 void loop()
 {
-    // // Just display QR code (comment out cycling for testing)
-    // displayQRCode();
-    // delay(100);
-
     // Cycle through different test patterns
     static uint8_t testMode = 0;
     static unsigned long lastChange = 0;
@@ -83,9 +54,9 @@ void loop()
     unsigned long displayTime = (testMode == 8) ? 4000 : 2000;
 
     if (millis() - lastChange > displayTime)
-    { // Change timing based on current test
+    {
         lastChange = millis();
-        testMode = (testMode + 1) % 9; // Now 9 different tests
+        testMode = (testMode + 1) % 9; // 9 different tests
     }
 
     switch (testMode)

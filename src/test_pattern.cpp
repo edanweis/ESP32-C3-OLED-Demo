@@ -3,26 +3,29 @@
 // Test pattern with alternating pixels
 void displayPatternTest()
 {
-    display.clearDisplay();
+    display.clearBuffer();
 
     // Draw checkerboard pattern
     for (int16_t y = 0; y < ACTUAL_HEIGHT; y += 2)
     {
         for (int16_t x = 0; x < ACTUAL_WIDTH; x += 2)
         {
-            drawPixelActual(x, y, SH110X_WHITE);
+            drawPixelActual(x, y, 1);
             if (x + 1 < ACTUAL_WIDTH && y + 1 < ACTUAL_HEIGHT)
             {
-                drawPixelActual(x + 1, y + 1, SH110X_WHITE);
+                drawPixelActual(x + 1, y + 1, 1);
             }
         }
     }
 
-    // Add text overlay
+    // Add text overlay (inverted: white box, black text)
+    display.setFont(u8g2_font_6x10_tr);
+    display.setDrawColor(1);
+    display.drawBox(SCREEN_OFFSET_X + 2, SCREEN_OFFSET_Y + 2, 48, 12); // white box
+    display.setDrawColor(0);
     setCursorActual(2, 2);
-    display.setTextSize(1);
-    display.setTextColor(SH110X_BLACK, SH110X_WHITE); // Inverted text
     display.print(F("Pattern"));
+    display.setDrawColor(1); // restore
 
-    display.display();
+    display.sendBuffer();
 }

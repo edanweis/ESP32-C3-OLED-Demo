@@ -3,11 +3,11 @@
 // Test individual pixels and addressing
 void displayPixelTest()
 {
-    display.clearDisplay();
+    display.clearBuffer();
 
-    // Set text properties
-    display.setTextSize(1);
-    display.setTextColor(SH110X_WHITE);
+    // Set font and color
+    display.setFont(u8g2_font_6x10_tr);
+    display.setDrawColor(1);
     setCursorActual(0, 0);
 
     // Display info about the screen
@@ -19,20 +19,20 @@ void displayPixelTest()
     display.print(SCREEN_OFFSET_Y);
 
     // Draw lines across the screen to test addressing
-    drawLineActual(0, 20, ACTUAL_WIDTH - 1, 20, SH110X_WHITE);  // Horizontal line
-    drawLineActual(36, 0, 36, ACTUAL_HEIGHT - 1, SH110X_WHITE); // Vertical line (center)
+    drawLineActual(0, 20, ACTUAL_WIDTH - 1, 20, 1);  // Horizontal line
+    drawLineActual(36, 0, 36, ACTUAL_HEIGHT - 1, 1); // Vertical line (center)
 
     // Test corner pixels
-    drawPixelActual(0, 0, SH110X_WHITE);
-    drawPixelActual(ACTUAL_WIDTH - 1, 0, SH110X_WHITE);
-    drawPixelActual(0, ACTUAL_HEIGHT - 1, SH110X_WHITE);
-    drawPixelActual(ACTUAL_WIDTH - 1, ACTUAL_HEIGHT - 1, SH110X_WHITE);
+    drawPixelActual(0, 0, 1);
+    drawPixelActual(ACTUAL_WIDTH - 1, 0, 1);
+    drawPixelActual(0, ACTUAL_HEIGHT - 1, 1);
+    drawPixelActual(ACTUAL_WIDTH - 1, ACTUAL_HEIGHT - 1, 1);
 
     // Show uptime
-    setCursorActual(0, 30);
+    setCursorActual(0, ACTUAL_HEIGHT - 8);
     display.print(F("Up:"));
     display.print(millis() / 1000);
     display.print(F("s"));
 
-    display.display();
+    display.sendBuffer();
 }

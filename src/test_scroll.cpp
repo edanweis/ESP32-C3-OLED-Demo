@@ -6,19 +6,19 @@ void displayScrollText()
     static int16_t textX = ACTUAL_WIDTH;
     static unsigned long lastScroll = 0;
 
-    if (millis() - lastScroll > 67) // Increased speed by 50% (was 100ms)
+    if (millis() - lastScroll > 67)
     {
         lastScroll = millis();
         textX -= 2;
         if (textX < -60)
-            textX = ACTUAL_WIDTH; // Reset when text goes off screen
+            textX = ACTUAL_WIDTH;
     }
 
-    display.clearDisplay();
+    display.clearBuffer();
 
+    display.setFont(u8g2_font_6x10_tr);
+    display.setDrawColor(1);
     setCursorActual(textX, 15);
-    display.setTextSize(1);
-    display.setTextColor(SH110X_WHITE);
     display.print(F("Scrolling Text!"));
 
     // Add a static header
@@ -26,7 +26,7 @@ void displayScrollText()
     display.print(F("Scroll Test"));
 
     // Add moving indicator
-    drawPixelActual((millis() / 100) % ACTUAL_WIDTH, 35, SH110X_WHITE);
+    drawPixelActual((millis() / 100) % ACTUAL_WIDTH, 35, 1);
 
-    display.display();
+    display.sendBuffer();
 }

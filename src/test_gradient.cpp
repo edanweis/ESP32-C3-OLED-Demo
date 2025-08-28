@@ -3,11 +3,11 @@
 // Gradient-like effect using dithering
 void displayGradientTest()
 {
-    display.clearDisplay();
+    display.clearBuffer();
 
+    display.setFont(u8g2_font_6x10_tr);
+    display.setDrawColor(1);
     setCursorActual(0, 0);
-    display.setTextSize(1);
-    display.setTextColor(SH110X_WHITE);
     display.print(F("Gradient"));
 
     // Create gradient effect using dithering
@@ -41,10 +41,10 @@ void displayGradientTest()
 
             if (shouldDraw)
             {
-                drawPixelActual(x, y, SH110X_WHITE);
+                drawPixelActual(x, y, 1);
             }
         }
     }
 
-    display.display();
+    display.sendBuffer();
 }
